@@ -29,7 +29,7 @@ function uploadSrtFromUrl() {
     }
   };
 
-  const response = YouTube.Captions.insert('snippet', resource, srtBlob);
+  const response = YouTube.Captions.insert(resource, 'snippet', srtBlob);
   Logger.log(JSON.stringify(response, null, 2));
   Logger.log(`✅ 字幕アップロード完了: Video ID = ${videoId}`);
 }
