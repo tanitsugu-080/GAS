@@ -15,7 +15,7 @@
 │  │  │  └─ YouTubeUploader.gs
 │  │  ├─ appsscript.json
 │  │  └─ clasp.json
-│  ├─ project-b/
+│  ├─ グーグルドライブアップローダー/
 │  │  ├─ src/
 │  │  │  └─ main.gs
 │  │  ├─ appsscript.json
@@ -23,7 +23,7 @@
 └─ tests/
    ├─ unit/
    │  ├─ youtube-caption-uploader.test.ts
-   │  ├─ project-b.test.ts
+   │  ├─ グーグルドライブアップローダー.test.ts
    │  └─ sharedHelpers.ts
    └─ integration/
       └─ README.md
