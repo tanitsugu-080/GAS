@@ -9,7 +9,7 @@
 // ======== エントリポイント ========
 /**
  * 指定されたパラメータを使って SRT 字幕をアップロードする。
- * @param {{url: string, srtFileId: string, language?: string, name?: string, isDraft?: boolean|string}} params
+ * @param {{url: string, srtUrl?: string, srtFileId?: string, language?: string, name?: string, isDraft?: boolean|string}} params
  * @returns {{videoId: string, captionId: string, language: (string|undefined), name: (string|undefined), rawResponse: GoogleAppsScript.YouTube.Schema.Caption}}
  */
 function uploadSrtFromUrl(params) {
@@ -47,11 +47,12 @@ function uploadSrtFromUrl(params) {
  * 期待する JSON ボディ:
  * {
  *   "url": "https://www.youtube.com/watch?v=...",
- *   "srtFileId": "<Google Drive file id>",
+ *   "srtUrl": "https://drive.google.com/file/d/...",
  *   "language": "en",
  *   "name": "English",
  *   "isDraft": false
  * }
+ * ※ srtFileId は後方互換性のため引き続き利用可能
  */
 function doPost(e) {
   try {
@@ -137,7 +138,8 @@ function normalizeCaptionRequest_(raw) {
   }
 
   const url = coerceNonEmptyString_(raw.url);
-  const srtFileIdRaw = coerceNonEmptyString_(raw.srtFileId);
+  const srtUrlRaw = coerceNonEmptyString_(raw.srtUrl);
+  const srtFileIdRaw = srtUrlRaw || coerceNonEmptyString_(raw.srtFileId);
   const srtFileId = extractDriveFileId_(srtFileIdRaw);
   const language = coerceNonEmptyString_(raw.language) || 'en';
   const name = coerceNonEmptyString_(raw.name) || language;
@@ -147,7 +149,7 @@ function normalizeCaptionRequest_(raw) {
     throw createValidationError_('url は必須項目です。');
   }
   if (!srtFileId) {
-    throw createValidationError_('srtFileId は必須項目です。');
+    throw createValidationError_('srtUrl または srtFileId は必須項目です。');
   }
 
   return {
