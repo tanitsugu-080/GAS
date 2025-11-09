@@ -137,7 +137,8 @@ function normalizeCaptionRequest_(raw) {
   }
 
   const url = coerceNonEmptyString_(raw.url);
-  const srtFileId = coerceNonEmptyString_(raw.srtFileId);
+  const srtFileIdRaw = coerceNonEmptyString_(raw.srtFileId);
+  const srtFileId = extractDriveFileId_(srtFileIdRaw);
   const language = coerceNonEmptyString_(raw.language) || 'en';
   const name = coerceNonEmptyString_(raw.name) || language;
   const isDraft = parseBoolean_(raw.isDraft, false);
@@ -173,6 +174,31 @@ function parseJsonIfPossible_(text) {
 function coerceNonEmptyString_(value) {
   if (value === null || value === undefined) return '';
   return String(value).trim();
+}
+
+function extractDriveFileId_(value) {
+  if (!value) return '';
+  const trimmed = String(value).trim();
+  if (!trimmed) return '';
+
+  if (/^[A-Za-z0-9_-]{10,}$/.test(trimmed) && trimmed.indexOf('/') === -1) {
+    return trimmed;
+  }
+
+  try {
+    const url = new URL(trimmed);
+    const host = url.hostname.replace(/^www\./i, '').toLowerCase();
+    if (host === 'drive.google.com') {
+      const fileMatch = url.pathname.match(/\/file\/d\/([^/]+)/);
+      if (fileMatch && fileMatch[1]) return fileMatch[1];
+      const folderMatch = url.pathname.match(/\/folders\/([^/]+)/);
+      if (folderMatch && folderMatch[1]) return folderMatch[1];
+      const idParam = url.searchParams.get('id');
+      if (idParam) return idParam;
+    }
+  } catch (e) {}
+
+  return trimmed;
 }
 
 function parseBoolean_(value, defaultValue) {
