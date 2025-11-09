@@ -10,9 +10,9 @@
 ├─ scripts/
 │  └─ README.md
 ├─ gas-projects/
-│  ├─ project-a/
+│  ├─ youtube-caption-uploader/
 │  │  ├─ src/
-│  │  │  └─ main.gs
+│  │  │  └─ YouTubeUploader.gs
 │  │  ├─ appsscript.json
 │  │  └─ clasp.json
 │  ├─ project-b/
@@ -22,7 +22,7 @@
 │  │  └─ clasp.json
 └─ tests/
    ├─ unit/
-   │  ├─ project-a.test.ts
+   │  ├─ youtube-caption-uploader.test.ts
    │  ├─ project-b.test.ts
    │  └─ sharedHelpers.ts
    └─ integration/
