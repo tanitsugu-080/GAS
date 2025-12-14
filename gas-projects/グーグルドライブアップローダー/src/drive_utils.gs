@@ -113,3 +113,49 @@ function updateFileFromBase64(fileId, p) {
 
   return { id: updated.id, name: f.getName(), url: f.getUrl() };
 }
+
+/**
+ * ファイル一覧取得（拡張子で任意フィルタ）
+ * - Advanced Drive Service: Drive.Files.list を使用
+ * @param {Object} [p]
+ * @param {string} [p.filetype] "srt" や ".srt" のような拡張子指定。未指定ならすべてのファイルが対象
+ * @param {string} [p.parentId] 親フォルダIDで絞り込み
+ * @param {number} [p.pageSize] 1～1000の件数指定
+ * @param {string} [p.pageToken] 次ページ取得用トークン
+ * @return {{files: GoogleAppsScript.Drive.Schema.File[], nextPageToken: string}}
+ */
+function listFiles(p) {
+  const parentId = p && p.parentId;
+  const pageToken = p && p.pageToken;
+  const pageSize = p && p.pageSize;
+  const extensionRaw = p && p.filetype ? String(p.filetype).trim() : '';
+  const extension = extensionRaw
+    ? (extensionRaw.startsWith('.') ? extensionRaw : '.' + extensionRaw)
+    : '';
+
+  const qParts = ['trashed = false'];
+
+  if (extension) {
+    // 単純なエスケープ（"'" を "\'" に置換）でクエリ壊れを防ぐ
+    const escapedExt = extension.replace(/'/g, "\\'");
+    qParts.push(`name contains '${escapedExt}'`);
+  }
+  if (parentId) {
+    qParts.push(`'${parentId}' in parents`);
+  }
+
+  const params = {
+    q: qParts.join(' and '),
+    fields: 'files(id,name,mimeType,modifiedTime,webViewLink),nextPageToken'
+  };
+
+  if (pageSize && pageSize > 0 && pageSize <= 1000) {
+    params.pageSize = pageSize;
+  }
+  if (pageToken) {
+    params.pageToken = pageToken;
+  }
+
+  const res = Drive.Files.list(params); // 要: 追加サービス「Drive API」
+  return { files: res.files || [], nextPageToken: res.nextPageToken || '' };
+}

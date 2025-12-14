@@ -1,5 +1,5 @@
 function doGet(e) {
-  return jsonResponse({ ok: true, version: 'v2025-11-10-folder-create' });
+  return jsonResponse({ ok: true, version: 'v2025-11-10-folder-create-list-files-no-legacy' });
 }
 
 function doPost(e) {
@@ -60,6 +60,17 @@ function doPost(e) {
         makePublic: !!body.makePublic
       });
       return jsonResponse({ ok: true, ...updated });
+    }
+
+    // === ファイル一覧取得（拡張子任意） ===
+    if (op === 'list-files') {
+      const result = listFiles({
+        filetype: body.filetype,
+        parentId: body.parentId,
+        pageSize: typeof body.pageSize === 'number' ? body.pageSize : undefined,
+        pageToken: body.pageToken
+      });
+      return jsonResponse({ ok: true, ...result });
     }
 
     // === 未対応のop ===
